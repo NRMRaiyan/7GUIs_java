@@ -4,48 +4,51 @@ import java.awt.event.*;
 import java.text.*;
 import java.util.Date;
 
-public class flightBooker{
+public class flightBooker {
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    JFrame frame;
+    JComboBox<String> flightType;
+    JTextField startDateField;
+    JTextField returnDateField;
+    JButton bookButton;
 
-    public flightBooker(){
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-        //Frame
-        JFrame frame = new JFrame("Book Flight");
-        frame.setSize(450, 220);
+    public flightBooker() {
+
+        frame = new JFrame("Flight Booker");
+        frame.setSize(400, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new GridLayout(4, 1, 10, 10));
 
-        //Date Format Stict
         dateFormat.setLenient(false);
 
-        //Flight type combo box
-        JComboBox<String> flightType;
-        String [] options = {"one-way flight", "return flight"};
+        String[] options = {
+                "one-way flight",
+                "return flight"
+        };
+
         flightType = new JComboBox<>(options);
 
-        //Text Fields
-        JTextField startDateField = new JTextField("01-01-2026");
-        JTextField returnDateField = new JTextField("01-01-2026");
+        startDateField = new JTextField("04.04.2026");
+        returnDateField = new JTextField("04.04.2026");
 
-        //Button
-        JButton bookButton = new JButton("Book");
+        bookButton = new JButton("Book");
 
-        //Initially Disabled Return Date
         returnDateField.setEnabled(false);
 
-        //Add Components
         frame.add(flightType);
         frame.add(startDateField);
         frame.add(returnDateField);
         frame.add(bookButton);
 
-        //ComboBox Action
+        // ComboBox listener
         flightType.addActionListener(e -> updateState());
 
-        //Text Field Listeners
+        // Keyboard listener
         KeyAdapter listener = new KeyAdapter() {
-            public void keyReleased(KeyEvent e){
+
+            public void keyReleased(KeyEvent e) {
                 updateState();
             }
         };
@@ -53,39 +56,39 @@ public class flightBooker{
         startDateField.addKeyListener(listener);
         returnDateField.addKeyListener(listener);
 
-        //Button click
+        // Button action
         bookButton.addActionListener(e -> bookFlight());
 
-        //Initial Validation
         updateState();
 
-        //Show Frame
         frame.setVisible(true);
     }
 
-    //Check Valid Dtate
-    private boolean isValidDate(String text){
+    // Check valid date
+    private boolean isValidDate(String text) {
 
-        try{
+        try {
             dateFormat.parse(text);
             return true;
-        }catch(ParseException e){
+        }
+        catch (ParseException e) {
             return false;
         }
     }
 
-    //Convert String to Date
-    private Date getDate(String text){
-        try{
+    // Convert String to Date
+    private Date getDate(String text) {
+
+        try {
             return dateFormat.parse(text);
         }
-        catch(ParseException e){
+        catch (ParseException e) {
             return null;
         }
     }
 
-    //UpdateState
-    private void updateState(){
+    // Update GUI state
+    private void updateState() {
 
         boolean returnFlight = flightType.getSelectedItem().equals("return flight");
 
@@ -96,37 +99,63 @@ public class flightBooker{
         boolean returnValid = isValidDate(returnDateField.getText());
 
         startDateField.setBackground(
-            startValid ? Color.WHITE : Color.RED;
+                startValid ? Color.WHITE : Color.PINK
         );
 
-        if(returnFlight){
-            returnDateField.setBackground(returnValid ? Color.WHITE : Color.RED);
+        if (returnFlight){
+            returnDateField.setBackground(returnValid ? Color.WHITE : Color.PINK);
         }else{
             returnDateField.setBackground(Color.WHITE);
         }
 
         boolean valid = startValid;
 
-        if(returnFlight){
+        if (returnFlight) {
+
             valid = valid && returnValid;
-            
-            if(startValid && returnValid){
+
+            if (startValid && returnValid) {
+
                 Date startDate = getDate(startDateField.getText());
-                
+
                 Date returnDate = getDate(returnDateField.getText());
-                
-                if(returnDate.before(startDate)){
-                    
+
+                if (returnDate.before(startDate)) {
                     valid = false;
                 }
             }
         }
+
         bookButton.setEnabled(valid);
     }
 
-    //Booking Message
+    // Booking message
+    private void bookFlight() {
 
-    public static void main(String [] args){
+        String type = (String) flightType.getSelectedItem();
+
+        if (type.equals("one-way flight")) {
+
+            JOptionPane.showMessageDialog(
+                    frame,
+                    "You booked a one-way flight on "
+                            + startDateField.getText()
+            );
+        }
+        else {
+
+            JOptionPane.showMessageDialog(
+                    frame,
+                    "You booked a return flight from "
+                            + startDateField.getText()
+                            + " to "
+                            + returnDateField.getText()
+            );
+        }
+    }
+
+    public static void main(String[] args) {
+
         new flightBooker();
     }
 }
