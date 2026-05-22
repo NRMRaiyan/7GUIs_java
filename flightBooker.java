@@ -63,6 +63,69 @@ public class flightBooker{
         frame.setVisible(true);
     }
 
+    //Check Valid Dtate
+    private boolean isValidDate(String text){
+
+        try{
+            dateFormat.parse(text);
+            return true;
+        }catch(ParseException e){
+            return false;
+        }
+    }
+
+    //Convert String to Date
+    private Date getDate(String text){
+        try{
+            return dateFormat.parse(text);
+        }
+        catch(ParseException e){
+            return null;
+        }
+    }
+
+    //UpdateState
+    private void updateState(){
+
+        boolean returnFlight = flightType.getSelectedItem().equals("return flight");
+
+        returnDateField.setEnabled(returnFlight);
+
+        boolean startValid = isValidDate(startDateField.getText());
+
+        boolean returnValid = isValidDate(returnDateField.getText());
+
+        startDateField.setBackground(
+            startValid ? Color.WHITE : Color.RED;
+        );
+
+        if(returnFlight){
+            returnDateField.setBackground(returnValid ? Color.WHITE : Color.RED);
+        }else{
+            returnDateField.setBackground(Color.WHITE);
+        }
+
+        boolean valid = startValid;
+
+        if(returnFlight){
+            valid = valid && returnValid;
+            
+            if(startValid && returnValid){
+                Date startDate = getDate(startDateField.getText());
+                
+                Date returnDate = getDate(returnDateField.getText());
+                
+                if(returnDate.before(startDate)){
+                    
+                    valid = false;
+                }
+            }
+        }
+        bookButton.setEnabled(valid);
+    }
+
+    //Booking Message
+
     public static void main(String [] args){
         new flightBooker();
     }
